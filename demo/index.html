@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>InvoiceFlow — invoicing that does the money math in integers</title>
+  <meta name="description" content="A local-first invoicing app with integer money math, multi-currency totals, tax-before-discount rules, recurring schedules and a printable invoice." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230b0f1a'/><text x='16' y='22' font-family='sans-serif' font-size='16' font-weight='700' fill='%23f5c26b' text-anchor='middle'>N</text></svg>" />
+  <link rel="stylesheet" href="arvion.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="aurora"></div>
+  <div class="grid-lines"></div>
+
+  <div class="app shell">
+    <!-- ---------------------------------------------------------------- -->
+    <aside class="sidebar">
+      <a class="brand" href="#dashboard" style="padding:6px 8px 14px">
+        <span class="brand-mark">N</span>
+        <span>
+          <span class="brand-word">INVOICE<b>FLOW</b></span>
+          <span class="brand-sub" style="display:block">by Arvion</span>
+        </span>
+      </a>
+
+      <div class="nav-label">Billing</div>
+      <a class="nav-item" href="#dashboard" data-view="dashboard"><span class="nav-dot"></span>Dashboard</a>
+      <a class="nav-item" href="#invoices" data-view="invoices"><span class="nav-dot"></span>Invoices<span class="badge" id="nav-invoice-count" style="margin-left:auto;padding:1px 7px">–</span></a>
+      <a class="nav-item" href="#new" data-view="new"><span class="nav-dot"></span>New invoice</a>
+
+      <div class="nav-label">Money in</div>
+      <a class="nav-item" href="#recurring" data-view="recurring"><span class="nav-dot"></span>Recurring</a>
+      <a class="nav-item" href="#settings" data-view="settings"><span class="nav-dot"></span>Settings</a>
+
+      <div style="flex:1"></div>
+
+      <div class="card flat pad-sm" style="margin-top:14px">
+        <div class="row" style="gap:8px">
+          <span class="badge green"><span class="dot pulse"></span>local-first</span>
+          <span class="spacer"></span>
+          <span class="small muted mono">v1.0</span>
+        </div>
+        <p class="small muted" style="margin:8px 0 0" id="sidebar-stats">Loading sample workspace…</p>
+      </div>
+      <a class="nav-item" href="https://github.com/arvion-technology/invoiceflow" target="_blank" rel="noopener"><span class="nav-dot"></span>Source on GitHub ↗</a>
+    </aside>
+
+    <!-- ---------------------------------------------------------------- -->
+    <div style="min-width:0">
+      <header class="topbar">
+        <div class="search" style="width:min(340px,34vw)">
+          <input class="input" id="global-search" placeholder="Search invoice number or client…" aria-label="Search invoices" />
+        </div>
+        <span class="spacer"></span>
+        <span class="badge" id="topbar-today">–</span>
+        <span class="badge blue"><span class="dot"></span>base USD</span>
+        <button class="btn sm" id="topbar-new">New invoice</button>
+        <div class="avatar" title="Northline Studio — sample workspace">NS</div>
+      </header>
+
+      <main class="main">
+        <!-- ============================================================ -->
+        <section data-view-panel="dashboard">
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">Finance</div>
+              <h1>Dashboard</h1>
+              <p class="lede">A sample workspace of 16 invoices, converted to USD with fixed rates.</p>
+            </div>
+            <span class="spacer"></span>
+            <div class="row">
+              <button class="btn sm" id="export-dashboard">Export CSV</button>
+              <button class="btn primary sm" id="dashboard-new">New invoice</button>
+            </div>
+          </div>
+
+          <div class="grid grid-4" id="kpis" style="margin-bottom:16px"></div>
+
+          <div class="grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr);margin-bottom:16px">
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <div class="card-title">Invoiced vs collected</div>
+                  <div class="card-sub">Trailing six months, converted to USD</div>
+                </div>
+                <span class="spacer"></span>
+                <div class="legend"><span><i style="background:var(--gold)"></i>Invoiced</span><span><i style="background:var(--blue)"></i>Collected</span></div>
+              </div>
+              <div id="revenue-chart"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><div class="card-title">Ageing</div><span class="spacer"></span><span class="badge" id="ageing-total">–</span></div>
+              <div id="ageing-donut" style="display:flex;justify-content:center"></div>
+              <div class="grid grid-2" id="ageing-legend" style="gap:6px 16px;margin-top:12px;font-size:12px"></div>
+            </div>
+          </div>
+
+          <div class="grid" style="grid-template-columns:minmax(0,1.55fr) minmax(0,1fr)">
+            <div class="card" style="padding:0">
+              <div class="card-head" style="padding:20px 20px 0;margin-bottom:12px">
+                <div><div class="card-title">Recent invoices</div><div class="card-sub">Newest first</div></div>
+                <span class="spacer"></span>
+                <a class="btn ghost sm" href="#invoices">View all →</a>
+              </div>
+              <div id="recent-invoices"></div>
+            </div>
+            <div class="col" style="gap:16px">
+              <div class="card">
+                <div class="card-head"><div class="card-title">Needs attention</div><span class="spacer"></span><span class="badge red" id="attention-count">–</span></div>
+                <div class="col" id="attention-list" style="gap:10px"></div>
+              </div>
+              <div class="card">
+                <div class="card-head"><div class="card-title">Next recurring</div><span class="spacer"></span><a class="btn ghost sm" href="#recurring">Manage</a></div>
+                <div id="next-recurring"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <section data-view-panel="invoices" hidden>
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">Records</div>
+              <h1>Invoices</h1>
+              <p class="lede">Sixteen invoices across nine clients and seven currencies. Status is derived from payments and the due date, never stored.</p>
+            </div>
+            <span class="spacer"></span>
+            <div class="row">
+              <button class="btn sm" id="export-invoices">Export CSV</button>
+              <button class="btn primary sm" id="invoices-new">New invoice</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="row wrap">
+              <div class="tabs" id="status-tabs" role="tablist" aria-label="Filter by status"></div>
+              <span class="spacer"></span>
+              <div class="search" style="width:260px"><input class="input" id="invoice-search" placeholder="Filter this list…" /></div>
+              <select class="select" id="client-filter" style="width:180px" aria-label="Client"></select>
+            </div>
+          </div>
+
+          <div class="card" style="padding:0">
+            <div id="invoice-table"></div>
+          </div>
+          <div class="row" style="padding:12px 2px">
+            <span class="small muted" id="invoice-count">–</span>
+            <span class="spacer"></span>
+            <span class="small muted" id="invoice-base-total">–</span>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <section data-view-panel="editor" hidden>
+          <div class="page-head">
+            <div>
+              <div class="eyebrow" id="editor-eyebrow">New</div>
+              <h1 id="editor-title">New invoice</h1>
+              <p class="lede" id="editor-lede">Amounts are entered in major units and stored as integer minor units. The totals panel recalculates as you type.</p>
+            </div>
+            <span class="spacer"></span>
+            <div class="row">
+              <button class="btn sm" id="editor-cancel">Cancel</button>
+              <button class="btn sm" id="editor-save-draft">Save draft</button>
+              <button class="btn primary sm" id="editor-save">Save and issue</button>
+            </div>
+          </div>
+
+          <div class="grid" style="grid-template-columns:minmax(0,1.65fr) minmax(320px,1fr);align-items:start">
+            <div class="col" style="gap:16px">
+              <div class="card">
+                <div class="card-head"><div class="card-title">Invoice details</div><span class="spacer"></span><span class="badge mono" id="editor-number">–</span></div>
+                <div class="grid grid-3">
+                  <label class="field">Client
+                    <select class="select" id="editor-client"></select>
+                  </label>
+                  <label class="field">Currency
+                    <select class="select" id="editor-currency"></select>
+                  </label>
+                  <label class="field">Payment terms
+                    <select class="select" id="editor-terms">
+                      <option value="7">7 days</option>
+                      <option value="14">14 days</option>
+                      <option value="21">21 days</option>
+                      <option value="30">30 days</option>
+                      <option value="45">45 days</option>
+                    </select>
+                  </label>
+                  <label class="field">Issued on
+                    <input class="input" type="date" id="editor-issued" />
+                  </label>
+                  <label class="field">Due on
+                    <input class="input" type="date" id="editor-due" />
+                  </label>
+                  <label class="field">Tax mode
+                    <select class="select" id="editor-tax-mode">
+                      <option value="exclusive">Add tax to prices</option>
+                      <option value="inclusive">Prices include tax</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div class="card" style="padding:0">
+                <div class="card-head" style="padding:20px 20px 0;margin-bottom:10px">
+                  <div><div class="card-title">Line items</div><div class="card-sub">Qty × unit price, then discount, then tax</div></div>
+                  <span class="spacer"></span>
+                  <button class="btn sm" id="editor-add-line">+ Add line</button>
+                </div>
+                <div id="line-items"></div>
+              </div>
+
+              <div class="card">
+                <div class="card-head"><div class="card-title">Discount and notes</div></div>
+                <div class="grid grid-3">
+                  <label class="field">Discount type
+                    <select class="select" id="editor-discount-type">
+                      <option value="none">No discount</option>
+                      <option value="percent">Percentage</option>
+                      <option value="fixed">Fixed amount</option>
+                    </select>
+                  </label>
+                  <label class="field">Discount value
+                    <input class="input" id="editor-discount-value" inputmode="decimal" placeholder="0" />
+                  </label>
+                  <label class="field">Default tax rate
+                    <select class="select" id="editor-tax-rate"></select>
+                  </label>
+                </div>
+                <label class="field" style="margin-top:14px">Notes on the invoice
+                  <textarea class="textarea" id="editor-notes" rows="3"></textarea>
+                </label>
+              </div>
+            </div>
+
+            <div class="card glow" id="totals-panel" style="position:sticky;top:84px"></div>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <section data-view-panel="print" hidden>
+          <div class="print-toolbar row">
+            <button class="btn sm" id="print-back">← Back</button>
+            <span class="spacer"></span>
+            <span class="small muted" id="print-hint">The print stylesheet removes this chrome — use your browser's Print / Save as PDF.</span>
+            <button class="btn sm" id="print-payment">Record payment</button>
+            <button class="btn sm" id="print-edit">Edit</button>
+            <button class="btn primary sm" id="print-print">Print / PDF</button>
+          </div>
+          <div id="print-host"></div>
+        </section>
+
+        <!-- ============================================================ -->
+        <section data-view-panel="recurring" hidden>
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">Schedules</div>
+              <h1>Recurring invoices</h1>
+              <p class="lede">Monthly rules anchored on a calendar day. A retainer dated the 31st bills the 28th in February and returns to the 31st in March.</p>
+            </div>
+          </div>
+          <div class="grid" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
+            <div class="col" id="recurring-rules" style="gap:16px"></div>
+            <div class="card">
+              <div class="card-head"><div class="card-title">Overdue reminders</div><span class="spacer"></span><span class="badge red" id="reminder-count">–</span></div>
+              <p class="small muted" style="margin-top:-4px">Suggested text based on the invoice facts. Copy and send from your own mail client.</p>
+              <div class="col" id="reminder-list" style="gap:12px"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <section data-view-panel="settings" hidden>
+          <div class="page-head">
+            <div>
+              <div class="eyebrow">Workspace</div>
+              <h1>Settings</h1>
+              <p class="lede">Business details appear on every printed invoice. Everything here is saved to this browser only.</p>
+            </div>
+            <span class="spacer"></span>
+            <button class="btn primary sm" id="settings-save">Save settings</button>
+          </div>
+          <div class="grid grid-2" style="align-items:start">
+            <div class="card">
+              <div class="card-head"><div class="card-title">Business profile</div></div>
+              <div class="grid grid-2">
+                <label class="field">Business name<input class="input" id="set-name" /></label>
+                <label class="field">Legal name<input class="input" id="set-legal" /></label>
+                <label class="field">Billing email<input class="input" id="set-email" /></label>
+                <label class="field">Phone<input class="input" id="set-phone" /></label>
+                <label class="field">Tax / PAN<input class="input" id="set-taxid" /></label>
+                <label class="field">Website<input class="input" id="set-website" /></label>
+              </div>
+              <label class="field" style="margin-top:12px">Address (one line per row)
+                <textarea class="textarea" id="set-address" rows="2"></textarea>
+              </label>
+              <div class="divider"></div>
+              <div class="card-head"><div class="card-title">Invoice defaults</div></div>
+              <div class="grid grid-2">
+                <label class="field">Default currency
+                  <select class="select" id="set-currency"></select>
+                </label>
+                <label class="field">Default tax rate
+                  <select class="select" id="set-tax"></select>
+                </label>
+                <label class="field">Number prefix<input class="input" id="set-prefix" /></label>
+                <label class="field">Payment terms
+                  <select class="select" id="set-terms">
+                    <option value="7">7 days</option><option value="14">14 days</option>
+                    <option value="21">21 days</option><option value="30">30 days</option>
+                  </select>
+                </label>
+              </div>
+              <p class="small muted mt-2" id="set-next-number">–</p>
+            </div>
+            <div class="col" style="gap:16px">
+              <div class="card">
+                <div class="card-head"><div class="card-title">Exchange rates</div><span class="spacer"></span><span class="badge" id="rates-asof">–</span></div>
+                <p class="small muted" style="margin-top:-4px" id="rates-note">–</p>
+                <div id="rates-table"></div>
+              </div>
+              <div class="card">
+                <div class="card-head"><div class="card-title">Data</div><span class="spacer"></span><span class="badge green">localStorage</span></div>
+                <p class="small" style="margin-top:-4px">The sample workspace lives in your browser. Reload keeps your changes; clearing site data restores the seed.</p>
+                <div class="row wrap">
+                  <button class="btn sm" id="data-export">Download JSON backup</button>
+                  <button class="btn sm" id="data-import">Import JSON</button>
+                  <button class="btn sm danger" id="data-reset">Restore sample data</button>
+                </div>
+                <input type="file" id="data-file" accept="application/json,.json" hidden />
+                <div class="divider"></div>
+                <dl class="kv" id="data-stats"></dl>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="demo-banner">
+    <span class="brand-mark" style="width:20px;height:20px;font-size:10px;border-radius:6px">A</span>
+    <span>Arvion Labs</span>
+    <span class="sep"></span>
+    <a href="https://arvion-technology.github.io/labs/">All projects</a>
+    <span class="sep"></span>
+    <a href="https://github.com/arvion-technology/invoiceflow" target="_blank" rel="noopener">source</a>
+  </div>
+
+  <script src="arvion.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
