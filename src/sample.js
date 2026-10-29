@@ -151,7 +151,7 @@ const TEMPLATES = [
     id: "inv-0015", clientId: "cli-7", currency: "AUD", issuedDaysAgo: 20, termsDays: 30,
     lines: [{ service: 4, qty: 1 }],
     voided: true,
-    note: "Voided — wrong entity on the invoice. Reissued as INV-2026-0048.",
+    note: "Voided, wrong entity on the invoice. Reissued as INV-2026-0048.",
   },
   {
     id: "inv-0016", clientId: "cli-5", currency: "EUR", issuedDaysAgo: 12, termsDays: 30,
@@ -260,7 +260,7 @@ export function buildSampleData({ now = Date.now() } = {}) {
     {
       id: "rec-1",
       clientId: "cli-1",
-      label: "Meridian Freight — product design retainer",
+      label: "Meridian Freight, product design retainer",
       currency: "USD",
       startOn: addDays(today, -26),
       every: 1,
@@ -274,7 +274,7 @@ export function buildSampleData({ now = Date.now() } = {}) {
     {
       id: "rec-2",
       clientId: "cli-8",
-      label: "Kanchen Studio — support and maintenance",
+      label: "Kanchen Studio, support and maintenance",
       currency: "NPR",
       startOn: addDays(today, -22),
       every: 1,

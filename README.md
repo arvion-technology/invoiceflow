@@ -2,11 +2,11 @@
 <img src="docs/demo.gif" alt="InvoiceFlow dashboard with revenue KPIs, six-month chart and ageing panel" width="100%" />
 </div>
 
-<sub>Recorded from the live demo — <a href="docs/demo.mp4">MP4</a> · <a href="docs/screenshot.png">static frame</a></sub>
+<sub>Recorded from the live demo, <a href="docs/demo.mp4">MP4</a> · <a href="docs/screenshot.png">static frame</a></sub>
 
 # InvoiceFlow
 
-Invoicing for a small studio: line items, discounts, tax, several currencies, payments and recurring retainers. It runs entirely in the browser — no server, no build step, no npm install. The part worth reading is the money engine: every amount is an integer number of minor units, discount is applied before tax, and every reported status is derived from the due date and recorded payments rather than stored.
+Invoicing for a small studio: line items, discounts, tax, several currencies, payments and recurring retainers. It runs entirely in the browser, no server, no build step, no npm install. The part worth reading is the money engine: every amount is an integer number of minor units, discount is applied before tax, and every reported status is derived from the due date and recorded payments rather than stored.
 
 [**Open the live demo**](https://arvion-technology.github.io/labs/demos/invoiceflow/) · [MIT](LICENSE)
 
@@ -16,12 +16,12 @@ The demo is seeded with sixteen invoices for nine fictional clients across USD, 
 
 ## What it does
 
-- **Dashboard** — invoiced, collected, outstanding and overdue in a reporting currency, a six-month invoiced-vs-collected chart, an ageing breakdown, recent invoices and the next scheduled retainers.
-- **Invoice list** — filter by derived status, client or free text; mark payments; export the current filter as CSV.
-- **Create and edit** — line items with quantity, unit price and per-line tax; percentage or fixed discount; tax-inclusive or tax-exclusive prices; live totals and the amount in words.
-- **Printable invoice** — a light paper layout that becomes a clean A4 page under `@media print`, ready for the browser's Save as PDF.
-- **Recurring schedules** — monthly, quarterly, weekly and yearly rules with month-end clamping, plus suggested overdue reminder text.
-- **Settings** — business profile, invoice numbering prefix, default terms, the sample exchange-rate table, JSON backup and restore.
+- **Dashboard**: invoiced, collected, outstanding and overdue in a reporting currency, a six-month invoiced-vs-collected chart, an ageing breakdown, recent invoices and the next scheduled retainers.
+- **Invoice list**: filter by derived status, client or free text; mark payments; export the current filter as CSV.
+- **Create and edit**: line items with quantity, unit price and per-line tax; percentage or fixed discount; tax-inclusive or tax-exclusive prices; live totals and the amount in words.
+- **Printable invoice**: a light paper layout that becomes a clean A4 page under `@media print`, ready for the browser's Save as PDF.
+- **Recurring schedules**: monthly, quarterly, weekly and yearly rules with month-end clamping, plus suggested overdue reminder text.
+- **Settings**: business profile, invoice numbering prefix, default terms, the sample exchange-rate table, JSON backup and restore.
 
 ## Screenshots
 
@@ -77,17 +77,17 @@ tax               = taxable line × rate          (or extracted when prices incl
 total             = Σ (taxable line + tax)
 ```
 
-A 10% discount on a taxed line therefore reduces the tax too, which is the client-friendly order. The discount is split by largest remainder so the line shares add back to the discount exactly; a naive `Math.round` per line is the usual way one cent disappears. Tax is rounded per line rather than once on the subtotal. That is the only way to report the right tax for mixed rates, and it means an invoice with two half-cent tax lines can differ by one cent from a flat calculation — the tests pin that behaviour rather than hiding it.
+A 10% discount on a taxed line therefore reduces the tax too, which is the client-friendly order. The discount is split by largest remainder so the line shares add back to the discount exactly; a naive `Math.round` per line is the usual way one cent disappears. Tax is rounded per line rather than once on the subtotal. That is the only way to report the right tax for mixed rates, and it means an invoice with two half-cent tax lines can differ by one cent from a flat calculation, the tests pin that behaviour rather than hiding it.
 
 Tax-inclusive prices are supported (`taxInclusive: true`). In that mode the engine extracts the tax instead of adding it: `base = round(gross × 10000 / (10000 + rate))`. Retail prices are normally quoted inclusive, and adding 13% on top of a shelf price is a different invoice.
 
-**Status is derived, never stored.** The only facts are the issue date, the due date, the void/draft flags and the payments. `deriveStatus()` applies a fixed precedence — void, draft, paid, partial, overdue, sent — against an injected `now`. An invoice due on 4 October is not overdue at 23:59:59.999 on 4 October; it becomes overdue one millisecond later. Because the clock is a parameter, the tests can stand on both sides of that boundary without waiting.
+**Status is derived, never stored.** The only facts are the issue date, the due date, the void/draft flags and the payments. `deriveStatus()` applies a fixed precedence, void, draft, paid, partial, overdue, sent, against an injected `now`. An invoice due on 4 October is not overdue at 23:59:59.999 on 4 October; it becomes overdue one millisecond later. Because the clock is a parameter, the tests can stand on both sides of that boundary without waiting.
 
 **Numbering.** `nextInvoiceNumber()` scans existing numbers for the prefix and year, takes the highest sequence and adds one. Void invoices keep their number: a gap in a tax sequence is a question an auditor will ask, so reusing one is worse than a hole. `parseInvoiceNumber()` and `sequenceGaps()` are there because imports from CSV are where duplicate numbers actually come from.
 
 **Recurring dates are calendar dates.** A retainer anchored on 31 January bills 28 February (29 in a leap year) and then returns to 31 March. The naive "add one month" either overflows into March or leaves the schedule stuck on the 28th. The rule stores the original anchor day and clamps it into the target month; `src/dates.js` keeps dates as `YYYY-MM-DD` strings so no timezone or DST transition can move a billing day. Due dates are issue date plus payment terms, computed in the same calendar space.
 
-**Multi-currency reporting uses one conversion.** Invoice totals stay in their own currency. The dashboard converts at fixed, illustrative mid-market rates quoted per USD with the formula `minorTo = minorFrom × rateTo × 10^expTo / (rateFrom × 10^expFrom)`, rounded once. The demo's rates are frozen on purpose — an offline demo that calls a live FX API is a demo that breaks in a meeting. The screenshot numbers and the sample data are computed from the same records.
+**Multi-currency reporting uses one conversion.** Invoice totals stay in their own currency. The dashboard converts at fixed, illustrative mid-market rates quoted per USD with the formula `minorTo = minorFrom × rateTo × 10^expTo / (rateFrom × 10^expFrom)`, rounded once. The demo's rates are frozen on purpose, an offline demo that calls a live FX API is a demo that breaks in a meeting. The screenshot numbers and the sample data are computed from the same records.
 
 ## Tests
 
@@ -97,10 +97,10 @@ npm test
 
 49 tests on `node:test`, split by concern:
 
-- `test/money.test.js` — parsing signs, parentheses, thousand separators and half-up rounding; JPY and KWD exponents; BigInt division; largest-remainder allocation; FX conversion in both directions; amount-in-words.
-- `test/tax.test.js` — discount before tax, fixed-discount capping, pro-rata shares summing exactly, inclusive-tax extraction, mixed rates, per-line rounding, fractional quantities, invalid inputs.
-- `test/invoice.test.js` — numbering and parsing, sequence gaps and duplicates, status precedence, the overdue boundary, overpayment, ageing buckets, monthly revenue, currency conversion.
-- `test/recurring.test.js` — month-end and leap-year clamping, quarterly and biweekly rules, payment terms, until/count limits, descriptions, future occurrences.
+- `test/money.test.js`: parsing signs, parentheses, thousand separators and half-up rounding; JPY and KWD exponents; BigInt division; largest-remainder allocation; FX conversion in both directions; amount-in-words.
+- `test/tax.test.js`: discount before tax, fixed-discount capping, pro-rata shares summing exactly, inclusive-tax extraction, mixed rates, per-line rounding, fractional quantities, invalid inputs.
+- `test/invoice.test.js`: numbering and parsing, sequence gaps and duplicates, status precedence, the overdue boundary, overpayment, ageing buckets, monthly revenue, currency conversion.
+- `test/recurring.test.js`: month-end and leap-year clamping, quarterly and biweekly rules, payment terms, until/count limits, descriptions, future occurrences.
 
 The demo also has a static check:
 

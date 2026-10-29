@@ -144,9 +144,9 @@ test("agingBuckets puts each unpaid invoice in exactly one bucket", () => {
   const buckets = agingBuckets(invoices, { now: NOW, base: "USD", rates: null });
   assert.deepEqual(buckets.map((b) => [b.label, b.count]), [
     ["Current", 1],
-    ["1–30 days", 1],
-    ["31–60 days", 1],
-    ["61–90 days", 1],
+    ["1-30 days", 1],
+    ["31-60 days", 1],
+    ["61-90 days", 1],
     ["90+ days", 1],
   ]);
   assert.equal(buckets.reduce((sum, b) => sum + b.amount, 0), 50000);

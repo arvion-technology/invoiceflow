@@ -3,8 +3,8 @@
  *
  * Every amount is an integer count of minor units: 1234 in USD means $12.34,
  * 1234 in JPY means ¥1,234, 1234 in KWD means 1.234 dinar. There is no float in
- * the storage model at all. Floats appear in exactly two places — reading a
- * typed price and converting using an exchange rate — and both are rounded once,
+ * the storage model at all. Floats appear in exactly two places, reading a
+ * typed price and converting using an exchange rate, and both are rounded once,
  * at the boundary, with an explicit rule.
  *
  * Rounding rule: half away from zero. `roundMinor(-105)` is -1.05 at exponent 2
@@ -122,7 +122,7 @@ function trimFloat(value) {
   return s.replace(/0+$/, "").replace(/\.$/, "");
 }
 
-/** Minor units as a major-unit number. Display only — never do math with it. */
+/** Minor units as a major-unit number. Display only, never do math with it. */
 export function toMajor(minor, code = "USD") {
   return minor / minorFactor(code);
 }

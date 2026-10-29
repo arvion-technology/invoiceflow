@@ -1,7 +1,7 @@
 /**
  * Recurring invoice schedules.
  *
- * The hard part is not "add 30 days" — it is the calendar. A retainer that
+ * The hard part is not "add 30 days", it is the calendar. A retainer that
  * starts on 31 January must bill 28 February in a non-leap year (29 in a leap
  * year) and then return to 31 March. The naive `new Date(y, m + 1, 31)` either
  * overflows into March or leaves the schedule stuck on the 28th forever. So the

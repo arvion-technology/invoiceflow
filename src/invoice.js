@@ -7,7 +7,7 @@
  * Status is *derived*, never stored. A stored status drifts: an invoice marked
  * "sent" yesterday is overdue today, and a cron job that forgets to run leaves
  * the dashboard lying. The only facts in the store are the issue date, the due
- * date, the void flag and the payments — everything else is calculated.
+ * date, the void flag and the payments, everything else is calculated.
  */
 
 import { computeTotals } from "./tax.js";
@@ -151,7 +151,7 @@ export function sequenceGaps(invoices, { prefix = "INV", year = new Date().getUT
   return gaps;
 }
 
-/** Numbers issued twice — a real risk when invoices are imported from CSV. */
+/** Numbers issued twice, a real risk when invoices are imported from CSV. */
 export function duplicateNumbers(invoices) {
   const counts = new Map();
   for (const invoice of invoices) counts.set(invoice.number, (counts.get(invoice.number) || 0) + 1);
@@ -172,7 +172,7 @@ function dateInRange(key, start, endExclusive) {
 
 /**
  * Headline totals for the dashboard, converted into the reporting currency.
- * Draft and void invoices are excluded from every money figure — an unissued
+ * Draft and void invoices are excluded from every money figure, an unissued
  * invoice is not revenue and a cancelled one is not a debt.
  */
 export function summarize(invoices, { now = Date.now(), base = "USD", rates = null } = {}) {
@@ -215,9 +215,9 @@ export function summarize(invoices, { now = Date.now(), base = "USD", rates = nu
 export function agingBuckets(invoices, { now = Date.now(), base = "USD", rates = null } = {}) {
   const labels = [
     { key: "current", label: "Current", max: 0 },
-    { key: "1-30", label: "1–30 days", max: 30 },
-    { key: "31-60", label: "31–60 days", max: 60 },
-    { key: "61-90", label: "61–90 days", max: 90 },
+    { key: "1-30", label: "1-30 days", max: 30 },
+    { key: "31-60", label: "31-60 days", max: 60 },
+    { key: "61-90", label: "61-90 days", max: 90 },
     { key: "90+", label: "90+ days", max: Infinity },
   ].map((bucket) => ({ ...bucket, count: 0, amount: 0 }));
 

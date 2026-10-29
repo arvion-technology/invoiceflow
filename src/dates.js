@@ -4,7 +4,7 @@
  * An invoice date is a *calendar date*, not an instant: "2026-10-28" means the
  * same day for a client in Kathmandu and a client in Toronto. Storing those as
  * epoch milliseconds invites the classic bug where an invoice issued at 00:15
- * local time is filed under the previous UTC day — and then a due date lands a
+ * local time is filed under the previous UTC day, and then a due date lands a
  * day early. So dates live as `YYYY-MM-DD` strings and every helper here does
  * arithmetic in UTC midnight space, where no timezone can shift them.
  */
@@ -44,7 +44,7 @@ export function dateKey(ts) {
   return d.toISOString().slice(0, 10);
 }
 
-/** Last millisecond of a calendar date — the moment an invoice becomes overdue. */
+/** Last millisecond of a calendar date, the moment an invoice becomes overdue. */
 export function endOfDay(key) {
   return toUTC(key) + DAY_MS - 1;
 }

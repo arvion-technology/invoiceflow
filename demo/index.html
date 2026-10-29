@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>InvoiceFlow — invoicing that does the money math in integers</title>
+  <title>InvoiceFlow | invoicing that does the money math in integers</title>
   <meta name="description" content="A local-first invoicing app with integer money math, multi-currency totals, tax-before-discount rules, recurring schedules and a printable invoice." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 9 L91 91 H73 L50 52 L27 91 H9 Z' fill='%23f5c26b'/><circle cx='50' cy='31' r='6.6' fill='%230b0f1a'/><path d='M50 52 L67 90 H33 Z' fill='%230b0f1a'/></svg>" />
   <link rel="stylesheet" href="arvion.css" />
@@ -27,7 +27,7 @@
 
       <div class="nav-label">Billing</div>
       <a class="nav-item" href="#dashboard" data-view="dashboard"><span class="nav-dot"></span>Dashboard</a>
-      <a class="nav-item" href="#invoices" data-view="invoices"><span class="nav-dot"></span>Invoices<span class="badge" id="nav-invoice-count" style="margin-left:auto;padding:1px 7px">–</span></a>
+      <a class="nav-item" href="#invoices" data-view="invoices"><span class="nav-dot"></span>Invoices<span class="badge" id="nav-invoice-count" style="margin-left:auto;padding:1px 7px">, </span></a>
       <a class="nav-item" href="#new" data-view="new"><span class="nav-dot"></span>New invoice</a>
 
       <div class="nav-label">Money in</div>
@@ -54,10 +54,10 @@
           <input class="input" id="global-search" placeholder="Search invoice number or client…" aria-label="Search invoices" />
         </div>
         <span class="spacer"></span>
-        <span class="badge" id="topbar-today">–</span>
+        <span class="badge" id="topbar-today">, </span>
         <span class="badge blue"><span class="dot"></span>base USD</span>
         <button class="btn sm" id="topbar-new">New invoice</button>
-        <div class="avatar" title="Northline Studio — sample workspace">NS</div>
+        <div class="avatar" title="Northline Studio, sample workspace">NS</div>
       </header>
 
       <main class="main">
@@ -91,7 +91,7 @@
               <div id="revenue-chart"></div>
             </div>
             <div class="card">
-              <div class="card-head"><div class="card-title">Ageing</div><span class="spacer"></span><span class="badge" id="ageing-total">–</span></div>
+              <div class="card-head"><div class="card-title">Ageing</div><span class="spacer"></span><span class="badge" id="ageing-total">, </span></div>
               <div id="ageing-donut" style="display:flex;justify-content:center"></div>
               <div class="grid grid-2" id="ageing-legend" style="gap:6px 16px;margin-top:12px;font-size:12px"></div>
             </div>
@@ -108,7 +108,7 @@
             </div>
             <div class="col" style="gap:16px">
               <div class="card">
-                <div class="card-head"><div class="card-title">Needs attention</div><span class="spacer"></span><span class="badge red" id="attention-count">–</span></div>
+                <div class="card-head"><div class="card-title">Needs attention</div><span class="spacer"></span><span class="badge red" id="attention-count">, </span></div>
                 <div class="col" id="attention-list" style="gap:10px"></div>
               </div>
               <div class="card">
@@ -147,9 +147,9 @@
             <div id="invoice-table"></div>
           </div>
           <div class="row" style="padding:12px 2px">
-            <span class="small muted" id="invoice-count">–</span>
+            <span class="small muted" id="invoice-count">, </span>
             <span class="spacer"></span>
-            <span class="small muted" id="invoice-base-total">–</span>
+            <span class="small muted" id="invoice-base-total">, </span>
           </div>
         </section>
 
@@ -172,7 +172,7 @@
           <div class="grid" style="grid-template-columns:minmax(0,1.65fr) minmax(320px,1fr);align-items:start">
             <div class="col" style="gap:16px">
               <div class="card">
-                <div class="card-head"><div class="card-title">Invoice details</div><span class="spacer"></span><span class="badge mono" id="editor-number">–</span></div>
+                <div class="card-head"><div class="card-title">Invoice details</div><span class="spacer"></span><span class="badge mono" id="editor-number">, </span></div>
                 <div class="grid grid-3">
                   <label class="field">Client
                     <select class="select" id="editor-client"></select>
@@ -245,7 +245,7 @@
           <div class="print-toolbar row">
             <button class="btn sm" id="print-back">← Back</button>
             <span class="spacer"></span>
-            <span class="small muted" id="print-hint">The print stylesheet removes this chrome — use your browser's Print / Save as PDF.</span>
+            <span class="small muted" id="print-hint">The print stylesheet removes this chrome, use your browser's Print / Save as PDF.</span>
             <button class="btn sm" id="print-payment">Record payment</button>
             <button class="btn sm" id="print-edit">Edit</button>
             <button class="btn primary sm" id="print-print">Print / PDF</button>
@@ -265,7 +265,7 @@
           <div class="grid" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
             <div class="col" id="recurring-rules" style="gap:16px"></div>
             <div class="card">
-              <div class="card-head"><div class="card-title">Overdue reminders</div><span class="spacer"></span><span class="badge red" id="reminder-count">–</span></div>
+              <div class="card-head"><div class="card-title">Overdue reminders</div><span class="spacer"></span><span class="badge red" id="reminder-count">, </span></div>
               <p class="small muted" style="margin-top:-4px">Suggested text based on the invoice facts. Copy and send from your own mail client.</p>
               <div class="col" id="reminder-list" style="gap:12px"></div>
             </div>
@@ -314,12 +314,12 @@
                   </select>
                 </label>
               </div>
-              <p class="small muted mt-2" id="set-next-number">–</p>
+              <p class="small muted mt-2" id="set-next-number">, </p>
             </div>
             <div class="col" style="gap:16px">
               <div class="card">
-                <div class="card-head"><div class="card-title">Exchange rates</div><span class="spacer"></span><span class="badge" id="rates-asof">–</span></div>
-                <p class="small muted" style="margin-top:-4px" id="rates-note">–</p>
+                <div class="card-head"><div class="card-title">Exchange rates</div><span class="spacer"></span><span class="badge" id="rates-asof">, </span></div>
+                <p class="small muted" style="margin-top:-4px" id="rates-note">, </p>
                 <div id="rates-table"></div>
               </div>
               <div class="card">

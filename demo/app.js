@@ -1,4 +1,4 @@
-// InvoiceFlow — demo application.
+// InvoiceFlow, demo application.
 // All money, tax, numbering and status logic comes from ../src/*.js. This file
 // only renders that state and handles interaction; there is no second copy of
 // the rules in the UI.
@@ -42,7 +42,7 @@ const baseCurrency = () => DB.settings.baseCurrency || "USD";
 const ratesTable = () => DB.rates || { base: "USD", rates: { USD: 1_000_000 } };
 
 function persist() {
-  if (!A.store.set(STORE_KEY, DB)) A.toast("Could not save — browser storage is full", "error");
+  if (!A.store.set(STORE_KEY, DB)) A.toast("Could not save, browser storage is full", "error");
 }
 
 function clientById(id) {
@@ -75,7 +75,7 @@ function parseMoneySafe(value, currency) {
 
 function currencyOptions(selected) {
   return Object.keys(CURRENCIES).sort().map((code) =>
-    el("option", { value: code, selected: code === selected ? "" : null, text: `${code} — ${CURRENCIES[code].name}` }));
+    el("option", { value: code, selected: code === selected ? "" : null, text: `${code}, ${CURRENCIES[code].name}` }));
 }
 
 function taxRateOptions(selected) {
@@ -175,7 +175,7 @@ function renderDashboard() {
       el("i", { style: `width:8px;height:8px;border-radius:2px;flex:none;background:${colours[i]}` }),
       el("span", { class: "label", text: bucket.label }),
       el("span", { class: "spacer" }),
-      el("span", { class: "amount", text: bucket.amount ? money(bucket.amount, baseCurrency()) : "—" }))));
+      el("span", { class: "amount", text: bucket.amount ? money(bucket.amount, baseCurrency()) : ", " }))));
 
   const recent = [...DB.invoices]
     .sort((a, b) => b.issuedOn.localeCompare(a.issuedOn) || b.number.localeCompare(a.number))
@@ -295,7 +295,7 @@ function renderInvoiceRows() {
       {
         label: "Paid",
         align: "right",
-        render: (inv) => el("span", { class: "mono muted", text: derived(inv).paid ? money(derived(inv).paid, inv.currency) : "—" }),
+        render: (inv) => el("span", { class: "mono muted", text: derived(inv).paid ? money(derived(inv).paid, inv.currency) : ", " }),
       },
       { label: "Status", align: "right", render: (inv) => statusBadge(derived(inv).status) },
       {
@@ -596,10 +596,10 @@ function renderPrint() {
   $("#print-hint").textContent = `${STATUS_LABEL[d.status]} · ${money(balance, invoice.currency)} balance · ${invoice.payments.length} payment${invoice.payments.length === 1 ? "" : "s"}`;
 
   const lineRows = totals.lines.map((line) => el("tr", {},
-    el("td", { class: "desc", text: line.description || "—" }),
+    el("td", { class: "desc", text: line.description || ", " }),
     el("td", { class: "qty", text: String(line.qty) }),
     el("td", { class: "num", text: money(line.unitPrice, invoice.currency) }),
-    el("td", { class: "num", text: line.taxRateBp ? `${(line.taxRateBp / 100).toFixed(line.taxRateBp % 100 === 0 ? 0 : 2)}%` : "—" }),
+    el("td", { class: "num", text: line.taxRateBp ? `${(line.taxRateBp / 100).toFixed(line.taxRateBp % 100 === 0 ? 0 : 2)}%` : ", " }),
     el("td", { class: "num", text: money(line.gross, invoice.currency) })));
 
   const totalRows = [el("div", { class: "line" },
@@ -669,7 +669,7 @@ function renderPrint() {
     el("div", { class: "paper-bottom" },
       el("div", { class: "paper-note" },
         el("div", { class: "paper-label", text: "Notes" }),
-        el("div", { text: invoice.notes || "—" }),
+        el("div", { text: invoice.notes || ", " }),
         el("div", { class: "block" },
           el("div", { class: "paper-label", text: "Payment details" }),
           el("div", {}, el("b", { text: business.bank.name }), ` · A/C ${business.bank.account}`),
@@ -687,7 +687,7 @@ function renderPrint() {
 function reminderText(inv) {
   const client = clientById(inv.clientId);
   const d = derived(inv);
-  return `Hi ${client.contact || client.name}, invoice ${inv.number} for ${money(d.due, inv.currency)} was due ${formatDate(inv.dueOn)} and is now ${d.daysPastDue} day${d.daysPastDue === 1 ? "" : "s"} past due. Could you confirm a payment date? — ${DB.settings.business.name}`;
+  return `Hi ${client.contact || client.name}, invoice ${inv.number} for ${money(d.due, inv.currency)} was due ${formatDate(inv.dueOn)} and is now ${d.daysPastDue} day${d.daysPastDue === 1 ? "" : "s"} past due. Could you confirm a payment date?, ${DB.settings.business.name}`;
 }
 
 function renderRecurring() {
@@ -739,13 +739,13 @@ function renderRecurring() {
               await navigator.clipboard.writeText(text);
               A.toast("Reminder copied to clipboard", "success");
             } catch {
-              A.toast("Clipboard blocked — select the text and copy manually", "error");
+              A.toast("Clipboard blocked, select the text and copy manually", "error");
             }
           },
           text: "Copy reminder",
         }),
         el("button", { class: "btn ghost sm", onclick: () => { location.hash = `#print/${inv.id}`; }, text: "Open invoice" })));
-  }) : [el("div", { class: "small muted", text: "No overdue invoices — no reminders to send." })]));
+  }) : [el("div", { class: "small muted", text: "No overdue invoices, no reminders to send." })]));
 }
 
 /* ---------------------------------------------------------------- settings */
@@ -767,7 +767,7 @@ function fillSettings() {
   const year = Number(todayKey(Date.now()).slice(0, 4));
   $("#set-next-number").textContent = `Next number: ${nextInvoiceNumber(DB.invoices, {
     prefix: defaults.prefix, year, pad: defaults.pad, separator: defaults.separator,
-  })} — void invoices still consume a number.`;
+  })}, void invoices still consume a number.`;
 
   $("#rates-note").textContent = ratesTable().note || "";
   $("#rates-asof").textContent = `as of ${formatDate(ratesTable().asOf || todayKey(Date.now()))}`;
